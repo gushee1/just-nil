@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 
 export default async function ProfilePage({ params }: { params: { id: string } }) {
+  const prisma = getPrisma();
   const user = await prisma.user.findUnique({
     where: { id: params.id },
     include: {

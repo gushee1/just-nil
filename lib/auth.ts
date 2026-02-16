@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "@/lib/prisma";
+import { getPrisma } from "@/lib/prisma";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -22,6 +22,7 @@ export const authOptions: NextAuthOptions = {
           return null;
         }
 
+        const prisma = getPrisma();
         const user = await prisma.user.findUnique({ where: { email: credentials.email } });
         if (!user) {
           return null;
