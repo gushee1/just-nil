@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import { Role } from "@prisma/client";
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { getPrisma } from "@/lib/prisma";
+import { getReadyPrisma } from "@/lib/prisma";
 
 const schema = z.object({
   name: z.string().min(2),
@@ -12,7 +12,7 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
-  const prisma = getPrisma();
+  const prisma = await getReadyPrisma();
   let payload: unknown;
   try {
     payload = await request.json();

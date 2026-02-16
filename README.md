@@ -82,7 +82,7 @@ Companies:
 1. Push this repo to GitHub.
 2. Import the repo into Vercel.
 3. Set environment variables in Vercel Project Settings:
-   - `DATABASE_URL=file:./dev.db`
+   - `DATABASE_URL=file:/tmp/dev.db`
    - `NEXTAUTH_URL` to your Vercel URL
    - `NEXTAUTH_SECRET` to a long random value
 4. Deploy.
@@ -92,4 +92,5 @@ No Terraform, AWS provisioning, or infrastructure-as-code is required.
 ## Notes
 
 - SQLite is suitable for this prototype.
-- On serverless environments, SQLite persistence is limited; this is acceptable for MVP/demo behavior.
+- On Vercel, SQLite should use `/tmp`, and data is ephemeral.
+- The app bootstraps tables at runtime for SQLite deployments if the DB file is empty.
