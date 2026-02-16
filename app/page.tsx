@@ -2,30 +2,35 @@ import Link from "next/link";
 
 export default function LandingPage() {
   return (
-    <section>
-      <div className="card">
-        <h1>Find your next NIL partnership</h1>
-        <p>
-          Just NIL connects student talent with brands ready to sponsor creators, athletes, and campus leaders.
-          Build your profile, discover matches, and express interest in one place.
+    <section className="space-y-8">
+      <div className="rounded-xl bg-gradient-to-r from-brand-900 to-brand-700 p-10 text-white">
+        <p className="text-sm uppercase tracking-widest text-brand-100">Two-sided NIL marketplace</p>
+        <h1 className="mt-2 text-4xl font-bold">Connect student creators with brand sponsors</h1>
+        <p className="mt-4 max-w-2xl text-brand-50">
+          JustNIL helps students showcase their audience and helps companies find aligned ambassadors quickly.
         </p>
-        <div className="row">
-          <Link href="/signup" style={{ textDecoration: "none", width: "100%" }}>
-            <button>Create account</button>
+        <div className="mt-6 flex gap-3">
+          <Link href="/signup" className="rounded-md bg-white px-4 py-2 font-semibold text-brand-900">
+            Create account
           </Link>
-          <Link href="/login" style={{ textDecoration: "none", width: "100%" }}>
-            <button className="secondary">Log in</button>
+          <Link href="/login" className="rounded-md border border-brand-100 px-4 py-2 font-semibold text-white">
+            Log in
           </Link>
         </div>
       </div>
-      <div className="grid two">
-        <article className="card">
-          <h3>For students</h3>
-          <p>Showcase your niche, social reach, and goals. Get ranked recommendations from sponsor companies.</p>
+
+      <div className="grid gap-4 md:grid-cols-3">
+        <article className="rounded-lg border border-slate-200 bg-white p-5">
+          <h2 className="font-semibold">Student Profiles</h2>
+          <p className="mt-2 text-sm text-slate-600">Share your school, platforms, and niche.</p>
         </article>
-        <article className="card">
-          <h3>For companies</h3>
-          <p>Define your audience, budget, and deal types. Review recommended students and request contact.</p>
+        <article className="rounded-lg border border-slate-200 bg-white p-5">
+          <h2 className="font-semibold">Company Preferences</h2>
+          <p className="mt-2 text-sm text-slate-600">Define target tags and discover matching talent.</p>
+        </article>
+        <article className="rounded-lg border border-slate-200 bg-white p-5">
+          <h2 className="font-semibold">Discovery Feed</h2>
+          <p className="mt-2 text-sm text-slate-600">Students and companies get relevant recommendations.</p>
         </article>
       </div>
     </section>

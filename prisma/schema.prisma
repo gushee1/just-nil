@@ -3,149 +3,47 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 enum Role {
   STUDENT
   COMPANY
-  ADMIN
-}
-
-enum VerificationStatus {
-  PENDING
-  VERIFIED
-  REJECTED
-}
-
-enum InteractionType {
-  LIKE
-  SAVE
-  INTEREST
-  REQUEST_CONTACT
 }
 
 model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
+  id           String          @id @default(cuid())
+  email        String          @unique
   passwordHash String
   role         Role
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
+  name         String
+  createdAt    DateTime        @default(now())
   studentProfile StudentProfile?
   companyProfile CompanyProfile?
-
-  interactionsSent     MatchInteraction[] @relation("InteractionsSent")
-  interactionsReceived MatchInteraction[] @relation("InteractionsReceived")
 }
 
 model StudentProfile {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  name            String
-  school          String
-  graduationYear  Int
-  major           String
-  archetype       String
-  location        String?
-  bio             String?
-  followerCount   Int      @default(0)
-  mediaUrl        String?
-  categories      String[]
-  niches          String[]
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id             String @id @default(cuid())
+  userId         String @unique
+  school         String
+  graduationYear Int
+  bio            String
+  tags           String
+  instagram      String?
+  tiktok         String?
+  youtube        String?
 
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  socials StudentSocial[]
-  tags    StudentTag[]
-}
-
-model StudentSocial {
-  id              String @id @default(cuid())
-  studentProfileId String
-  platform        String
-  url             String
-  followers       Int
-
-  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model CompanyProfile {
-  id                 String   @id @default(cuid())
-  userId             String   @unique
-  companyName        String
-  website            String?
-  industry           String
-  contactName        String
-  contactEmail       String
-  location           String?
-  lookingFor         String
-  minBudget          Int?
-  maxBudget          Int?
-  dealTypes          String[]
-  preferredPlatforms String[]
-  verificationStatus VerificationStatus @default(PENDING)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id          String @id @default(cuid())
+  userId      String @unique
+  companyName String
+  industry    String
+  description String
+  targetTags  String
 
-  user       User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tagsWanted CompanyTagWanted[]
-  documents  CompanyVerificationDocument[]
-}
-
-model Tag {
-  id   String @id @default(cuid())
-  name String @unique
-
-  studentTags StudentTag[]
-  companyTags CompanyTagWanted[]
-}
-
-model StudentTag {
-  id               String @id @default(cuid())
-  studentProfileId String
-  tagId            String
-
-  studentProfile StudentProfile @relation(fields: [studentProfileId], references: [id], onDelete: Cascade)
-  tag            Tag            @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@unique([studentProfileId, tagId])
-}
-
-model CompanyTagWanted {
-  id               String @id @default(cuid())
-  companyProfileId String
-  tagId            String
-
-  companyProfile CompanyProfile @relation(fields: [companyProfileId], references: [id], onDelete: Cascade)
-  tag            Tag            @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@unique([companyProfileId, tagId])
-}
-
-model CompanyVerificationDocument {
-  id               String   @id @default(cuid())
-  companyProfileId String
-  fileName         String
-  fileUrl          String
-  mimeType         String
-  uploadedAt       DateTime @default(now())
-
-  companyProfile CompanyProfile @relation(fields: [companyProfileId], references: [id], onDelete: Cascade)
-}
-
-model MatchInteraction {
-  id           String          @id @default(cuid())
-  actorUserId  String
-  targetUserId String
-  type         InteractionType
-  createdAt    DateTime        @default(now())
-
-  actorUser  User @relation("InteractionsSent", fields: [actorUserId], references: [id], onDelete: Cascade)
-  targetUser User @relation("InteractionsReceived", fields: [targetUserId], references: [id], onDelete: Cascade)
-
-  @@unique([actorUserId, targetUserId, type])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

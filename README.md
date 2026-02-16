@@ -1,122 +1,95 @@
-# Just NIL
+# JustNIL Prototype
 
-Prototype full-stack web app that matches students seeking NIL sponsorships with companies ready to sponsor them.
+JustNIL is a prototype two-sided marketplace that connects students seeking NIL sponsorships with companies that want to sponsor them.
 
-## 1) Architecture
+## Stack
 
-- Frontend: Next.js (App Router) + TypeScript
-- Backend API: Next.js Route Handlers (`app/api/*`) running as Vercel serverless functions
-- Database: PostgreSQL + Prisma ORM + migrations
-- Auth: Email/password, JWT session cookie, role-based access (`STUDENT`, `COMPANY`, `ADMIN`)
-- File uploads: Signed S3 upload URL flow for company verification docs
-- Matching: Server-side scoring endpoint (`/api/discovery`) based on tag overlap + niche + location + budget/follower heuristics
-- IaC/Deployment: Terraform with Vercel provider (project, env vars, domain)
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Prisma ORM
+- SQLite
+- NextAuth.js (Credentials provider)
 
-## 2) Core data models
+## Features in this prototype
 
-Defined in `prisma/schema.prisma`:
+- Landing page
+- Signup with role selection (Student or Company)
+- Login with email/password
+- Role-aware dashboard
+- Discovery feed
+- Profile pages for students and companies
+- Navbar + logout
+- Seeded demo data
+
+## Data models
 
 - `User`
-  - `email`, `passwordHash`, `role`
+  - id, email, passwordHash, role, name, createdAt
 - `StudentProfile`
-  - `name`, `school`, `graduationYear`, `major`, `archetype`, `followerCount`, `categories`, `niches`, `mediaUrl`
-- `StudentSocial`
-  - per-platform social links + follower stats
+  - id, userId, school, graduationYear, bio, tags, instagram, tiktok, youtube
 - `CompanyProfile`
-  - `companyName`, `industry`, `contact*`, `lookingFor`, `minBudget`, `maxBudget`, `dealTypes`, `preferredPlatforms`, `verificationStatus`
-- `Tag`, `StudentTag`, `CompanyTagWanted`
-  - normalized tagging for discovery and matching
-- `CompanyVerificationDocument`
-  - uploaded document metadata
-- `MatchInteraction`
-  - `LIKE`, `SAVE`, `INTEREST`, `REQUEST_CONTACT`
-
-## 3) Starter MVP happy path implemented
-
-- Landing page: `/`
-- Signup/Login: `/signup`, `/login`
-- Role-based dashboards:
-  - Student: `/dashboard/student` (profile editor)
-  - Company: `/dashboard/company` (profile editor + verification upload)
-- Discovery feed: `/discovery`
-  - Filters for tags/location/follower range
-  - Ranked results + actions (`like/save/interest/request contact`)
-- Admin endpoint for verification:
-  - `PATCH /api/admin/company/:companyId/verify`
+  - id, userId, companyName, industry, description, targetTags
 
 ## Local development
 
-1. Copy environment file:
-   - `cp .env.example .env`
-2. Start Postgres:
-   - `docker compose up -d`
-3. Install dependencies:
-   - `npm install`
-4. Generate Prisma client + run migrations:
-   - `npm run prisma:generate`
-   - `npm run prisma:migrate`
-5. Seed demo data:
-   - `npm run prisma:seed`
-6. Run app:
-   - `npm run dev`
+1. Install dependencies:
 
-Seeded accounts:
+```bash
+npm install
+```
 
-- Student: `student@example.com` / `password123`
-- Company: `company@example.com` / `password123`
-- Admin: `admin@example.com` / `password123`
+2. Generate Prisma client:
 
-## Terraform + Vercel deployment
+```bash
+npx prisma generate
+```
 
-Terraform config lives in `terraform/`.
+3. Run migrations:
 
-### What Terraform manages
+```bash
+npx prisma migrate dev
+```
 
-- `vercel_project`
-- `vercel_project_environment_variable`
-- `vercel_project_domain`
+4. Seed demo data:
 
-### Steps
+```bash
+npm run prisma:seed
+```
 
-1. Copy vars file:
-   - `cp terraform/terraform.tfvars.example terraform/terraform.tfvars`
-2. Fill in:
-   - `vercel_api_token`
-   - `vercel_team_id` (optional for personal account)
-   - `domain` (optional)
-   - `environment_variables` map (`DATABASE_URL`, `SESSION_SECRET`, S3 vars)
-3. Apply:
-   - `cd terraform`
-   - `terraform init`
-   - `terraform plan`
-   - `terraform apply`
+5. Start dev server:
 
-Then connect the Vercel project to your Git repo (or configure via Vercel UI/CLI), and trigger deployment.
+```bash
+npm run dev
+```
 
-## Matching logic
+## Seed/demo credentials
 
-Implemented in `lib/scoring.ts`.
+Students:
 
-Score combines:
+- `student1@justnil.dev` / `student123`
+- `student2@justnil.dev` / `student123`
+- `student3@justnil.dev` / `student123`
 
-- tag overlap (`student.tags` vs `company.tagsWanted`)
-- niche overlap
-- category/deal type overlap
-- same-location boost
-- budget and follower thresholds
+Companies:
 
-Endpoint:
+- `company1@justnil.dev` / `company123`
+- `company2@justnil.dev` / `company123`
+- `company3@justnil.dev` / `company123`
 
-- `GET /api/discovery`
+## Deployment (Vercel only)
 
-## Tests
+1. Push this repo to GitHub.
+2. Import the repo into Vercel.
+3. Set environment variables in Vercel Project Settings:
+   - `DATABASE_URL=file:./dev.db`
+   - `NEXTAUTH_URL` to your Vercel URL
+   - `NEXTAUTH_SECRET` to a long random value
+4. Deploy.
 
-- Unit tests for scoring and password hashing in `tests/`
-- Run: `npm test`
+No Terraform, AWS provisioning, or infrastructure-as-code is required.
 
-## Notes / production hardening
+## Notes
 
-- OAuth not enabled in this MVP (email/password implemented)
-- Add CSRF protection/rate limiting before production
-- Add object access controls and malware scanning for uploads
-- Add structured audit trail for admin verification actions
+- SQLite is suitable for this prototype.
+- On serverless environments, SQLite persistence is limited; this is acceptable for MVP/demo behavior.

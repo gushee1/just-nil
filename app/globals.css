@@ -1,103 +1,11 @@
-:root {
-  color-scheme: light;
-  --bg: #f5f7fb;
-  --text: #101318;
-  --muted: #5f6673;
-  --surface: #ffffff;
-  --border: #d9dee8;
-  --accent: #0b6bcb;
-  --accent-2: #094a8d;
-}
-
-* {
-  box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 body {
-  margin: 0;
-  font-family: "IBM Plex Sans", "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top right, #e8f2ff, transparent 40%), var(--bg);
-  color: var(--text);
-}
-
-a {
-  color: inherit;
+  @apply bg-slate-50 text-slate-900;
 }
 
 main {
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
-.card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-
-input,
-textarea,
-select,
-button {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font: inherit;
-}
-
-button {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-button.secondary {
-  background: white;
-  color: var(--accent-2);
-}
-
-.grid {
-  display: grid;
-  gap: 12px;
-}
-
-.grid.two {
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-.small {
-  font-size: 13px;
-  color: var(--muted);
-}
-
-.pill {
-  display: inline-block;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 4px 10px;
-  margin-right: 6px;
-  margin-bottom: 6px;
-  font-size: 12px;
-}
-
-.error {
-  color: #a31515;
-  font-size: 14px;
-}
-
-.success {
-  color: #0a6a2b;
-  font-size: 14px;
+  @apply mx-auto max-w-6xl px-4 py-8;
 }
