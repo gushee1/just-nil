@@ -1,26 +1,22 @@
 # JustNIL Prototype
 
-JustNIL is a prototype two-sided marketplace that connects students seeking NIL sponsorships with companies that want to sponsor them.
+JustNIL is a two-sided marketplace prototype connecting students seeking NIL sponsorships with companies looking to sponsor them.
 
 ## Stack
 
 - Next.js (App Router)
 - TypeScript
 - Tailwind CSS
+- NextAuth.js (Credentials)
 - Prisma ORM
-- SQLite
-- NextAuth.js (Credentials provider)
+- PostgreSQL
 
-## Features in this prototype
+## What changed for production reliability
 
-- Landing page
-- Signup with role selection (Student or Company)
-- Login with email/password
-- Role-aware dashboard
-- Discovery feed
-- Profile pages for students and companies
-- Navbar + logout
-- Seeded demo data
+- SQLite was removed to avoid ephemeral serverless file-storage issues on Vercel.
+- Prisma now uses PostgreSQL via `DATABASE_URL`.
+- Vercel build runs migrations before building the app:
+  - `prisma migrate deploy && next build`
 
 ## Data models
 
@@ -31,6 +27,16 @@ JustNIL is a prototype two-sided marketplace that connects students seeking NIL 
 - `CompanyProfile`
   - id, userId, companyName, industry, description, targetTags
 
+## Environment variables
+
+Required in local and Vercel:
+
+- `DATABASE_URL` (PostgreSQL connection string)
+- `NEXTAUTH_SECRET`
+- `NEXTAUTH_URL`
+
+See `.env.example`.
+
 ## Local development
 
 1. Install dependencies:
@@ -39,31 +45,33 @@ JustNIL is a prototype two-sided marketplace that connects students seeking NIL 
 npm install
 ```
 
-2. Generate Prisma client:
+2. Copy envs:
 
 ```bash
-npx prisma generate
+cp .env.example .env
 ```
 
-3. Run migrations:
+3. Ensure your local Postgres is running and `DATABASE_URL` points to it.
+
+4. Run migrations:
 
 ```bash
 npx prisma migrate dev
 ```
 
-4. Seed demo data:
+5. Seed demo data:
 
 ```bash
 npm run prisma:seed
 ```
 
-5. Start dev server:
+6. Start dev server:
 
 ```bash
 npm run dev
 ```
 
-## Seed/demo credentials
+## Demo accounts
 
 Students:
 
@@ -77,20 +85,36 @@ Companies:
 - `company2@justnil.dev` / `company123`
 - `company3@justnil.dev` / `company123`
 
-## Deployment (Vercel only)
+## Vercel deployment (Git push only)
 
-1. Push this repo to GitHub.
-2. Import the repo into Vercel.
-3. Set environment variables in Vercel Project Settings:
-   - `DATABASE_URL=file:/tmp/dev.db`
-   - `NEXTAUTH_URL` to your Vercel URL
-   - `NEXTAUTH_SECRET` to a long random value
-4. Deploy.
+1. Push repo to GitHub.
+2. Import into Vercel.
+3. Attach Vercel Postgres (recommended) or provide any Postgres URL.
+4. Set environment variables in Vercel Project Settings:
+   - `DATABASE_URL` = your Postgres connection string
+   - `NEXTAUTH_SECRET` = long random secret
+   - `NEXTAUTH_URL` = your deployed app URL (for example `https://your-app.vercel.app`)
+5. Deploy.
 
-No Terraform, AWS provisioning, or infrastructure-as-code is required.
+The build script automatically runs:
 
-## Notes
+- `prisma migrate deploy`
+- `next build`
 
-- SQLite is suitable for this prototype.
-- On Vercel, SQLite should use `/tmp`, and data is ephemeral.
-- The app bootstraps tables at runtime for SQLite deployments if the DB file is empty.
+## Dev-only DB inspection endpoint
+
+- Route: `GET /api/dev/users`
+- Behavior:
+  - Returns recent users (`id`, `email`, `role`, `createdAt`) in development
+  - Requires authenticated session
+  - Returns `404` in production
+
+## Smoke test checklist
+
+1. Open deployed app.
+2. Sign up as `Student` with a new email.
+3. Log out and log in with that email/password.
+4. Confirm dashboard loads and discovery page works.
+5. Confirm profile page loads from discovery links.
+6. (Local dev only) call `GET /api/dev/users` while logged in and verify the new user row exists.
+7. Check Vercel build logs show successful `prisma migrate deploy` before `next build`.
