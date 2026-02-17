@@ -3,11 +3,10 @@
 import Link from "next/link";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const params = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -30,7 +29,7 @@ export default function LoginPage() {
       return;
     }
 
-    router.push((params.get("callbackUrl") || "/dashboard") as "/dashboard");
+    router.push("/dashboard");
     router.refresh();
   }
 
